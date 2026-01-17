@@ -1,6 +1,6 @@
 [package]
 name = "yewi-cli"
-version = "0.1.2"
+version = "1.0.0"
 edition = "2024"
 authors = ["Fiaro fiaromiangaly@gmail.com"]
 description = "CLI tool for managing yewi-kit components in Yew projects"
