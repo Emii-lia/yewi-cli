@@ -63,7 +63,38 @@ fn clone_template(project_dir: &PathBuf) -> Result<(), Box<dyn Error>> {
   if git_dir.exists() {
     fs::remove_dir_all(git_dir).ok();
   }
+  update_cargo_toml(project_dir)?;
+  update_package_json(project_dir)?;
+
   println!("  Template ready");
+  Ok(())
+}
+
+fn update_cargo_toml(project_dir: &PathBuf) -> Result<(), Box<dyn Error>> {
+  let cargo_toml_path = project_dir.join("Cargo.toml");
+  let mut cargo_toml_content = fs::read_to_string(&cargo_toml_path)?;
+
+  cargo_toml_content = cargo_toml_content.replace(
+    "name = \"yewi-template\"",
+    &format!("name = \"{}\"", project_dir.file_name().unwrap().to_string_lossy()),
+  );
+
+  fs::write(&cargo_toml_path, cargo_toml_content)?;
+
+  Ok(())
+}
+
+fn update_package_json(project_dir: &PathBuf) -> Result<(), Box<dyn Error>> {
+  let package_json_path = project_dir.join("package.json");
+  let mut package_json_content = fs::read_to_string(&package_json_path)?;
+
+  package_json_content = package_json_content.replace(
+    "\"name\": \"yewi-template\"",
+    &format!("\"name\": \"{}\"", project_dir.file_name().unwrap().to_string_lossy()),
+  );
+
+  fs::write(&package_json_path, package_json_content)?;
+
   Ok(())
 }
 
