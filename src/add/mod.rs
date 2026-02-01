@@ -1,7 +1,10 @@
 use std::error::Error;
 use std::path::PathBuf;
-use crate::github::download_component;
-use crate::utils::{component_exists, update_components_mod, update_components_scss};
+use github::download_component;
+use crate::add::components::{component_exists, update_components_mod, update_components_scss};
+
+mod github;
+pub mod components;
 
 pub(crate) fn add(component_name: &str) -> Result<(), Box<dyn Error>> {
   let project_dir = PathBuf::from(".");
