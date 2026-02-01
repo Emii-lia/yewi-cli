@@ -64,6 +64,21 @@ This automatically:
 yewi new my-project
 yewi create my-project  # alias
 ```
+You will be asked to select a theme:
+```bash
+yewi new my-project
+ Creating a new Yew project: my-project
+
+? Select theme:   
+> Slate
+  Gray
+  Zinc
+  Neutral
+  Stone
+  Emerald
+v Blue
+[↑↓ to move, enter to select, type to filter]
+```
 
 ### Add a Component
 

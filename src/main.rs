@@ -3,11 +3,11 @@ use clap::{Parser, Subcommand};
 use crate::add::add;
 use crate::init::create;
 
-mod github;
-mod init;
-mod constants;
 mod add;
 mod utils;
+mod types;
+mod handlers;
+mod init;
 
 #[derive(Subcommand)]
 enum Commands {
