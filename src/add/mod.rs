@@ -14,10 +14,8 @@ pub(crate) fn add(component_name: &str) -> Result<(), Box<dyn Error>> {
   }
 
   if component_exists(&project_dir, component_name) {
-    return Err(format!(
-      "'{}' component already exists in the project.",
-      component_name
-    ).into());
+    println!("Component '{}' already exists in your project.", component_name);
+    return Ok(());
   }
   println!("Adding '{}' component...", component_name);
   println!();
