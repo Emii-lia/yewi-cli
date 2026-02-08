@@ -6,6 +6,9 @@ use crate::add::components::{component_exists, update_components_mod, update_com
 mod github;
 pub mod components;
 
+use indicatif::ProgressBar;
+use std::time::Duration;
+
 pub(crate) fn add(component_name: &str) -> Result<(), Box<dyn Error>> {
   let project_dir = PathBuf::from(".");
 
@@ -17,18 +20,27 @@ pub(crate) fn add(component_name: &str) -> Result<(), Box<dyn Error>> {
     println!("Component '{}' already exists in your project.", component_name);
     return Ok(());
   }
-  println!("Adding '{}' component...", component_name);
-  println!();
 
   download_component(component_name, &project_dir)?;
 
-  println!();
+  let spinner = ProgressBar::new_spinner();
+  spinner.set_style(
+    indicatif::ProgressStyle::default_spinner()
+      .tick_strings(&["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"])
+      .template("{spinner:.cyan} {msg}")
+      .unwrap()
+  );
+  spinner.enable_steady_tick(Duration::from_millis(80));
 
+  spinner.set_message(format!("Updating src/components/mod.rs for '{}'...", component_name));
   update_components_mod(&project_dir, component_name)?;
+
+  spinner.set_message(format!("Updating src/styles/components.scss for '{}'...", component_name));
   update_components_scss(&project_dir, component_name)?;
 
-  println!();
-  println!("'{}' component added to your project.", component_name);
+  spinner.finish_and_clear();
+
+  println!("✓ '{}' component added to your project.", component_name);
 
   Ok(())
 }
