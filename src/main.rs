@@ -1,13 +1,16 @@
 use std::error::Error;
 use clap::{Parser, Subcommand};
 use crate::add::add;
+use crate::handlers::select_components::select_components;
 use crate::init::create;
+use crate::list::list;
 
 mod add;
 mod utils;
 mod types;
 mod handlers;
 mod init;
+mod list;
 
 #[derive(Subcommand)]
 enum Commands {
@@ -27,8 +30,10 @@ enum Commands {
     override_usage = "yewi add <component_name1> <component_name2> ...",
   )]
   Add {
-    component_names: Vec<String>
-  }
+    component_names: Option<Vec<String>>
+  },
+  #[command(about = "List all available Yewi components")]
+  List
 }
 #[derive(Parser)]
 #[command(name = "yewi")]
@@ -52,9 +57,18 @@ fn main() -> Result<(), Box<dyn Error>> {
       create(&project_name)?;
     }
     Commands::Add { component_names } => {
+      let component_names = component_names.unwrap_or_else(|| {
+        let components = list();
+        select_components(components).expect("Failed to select components. Please try again.")
+      });
       for component_name in component_names {
         add(&component_name)?;
       };
+    },
+    Commands::List => {
+      for component in list::list() {
+        println!("- {}", component);
+      }
     }
   }
 

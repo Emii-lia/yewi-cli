@@ -7,6 +7,8 @@ use std::path::Path;
 use std::process::Command;
 use serde::Deserialize;
 use crate::utils::constants::get_repo_config;
+use indicatif::{ProgressBar, ProgressStyle};
+use std::time::Duration;
 
 struct FileInfo {
   name: String,
@@ -96,7 +98,7 @@ fn copy_component_files(
   target: &Path,
   component_name: &str,
 ) -> Result<(), Box<dyn Error>> {
-  let dest_component_dir = target.join("utils").join(component_name);
+  let dest_component_dir = target.join("src").join("components").join(component_name);
   if dest_component_dir.exists() {
     fs::remove_dir_all(&dest_component_dir)?;
   }
@@ -113,10 +115,6 @@ fn copy_component_files(
     }
   }
 
-  println!(
-    "Component '{}' downloaded to {:?}",
-    component_name, dest_component_dir
-  );
   Ok(())
 }
 pub fn download_component(component_name: &str, target_dir: &Path) -> Result<(), Box<dyn Error>> {
@@ -124,7 +122,15 @@ pub fn download_component(component_name: &str, target_dir: &Path) -> Result<(),
 
   let component_path = format!("src/components/{}", component_name);
 
-  println!("Downloading {} component from {}", component_name, repo_name);
+  let spinner = ProgressBar::new_spinner();
+  spinner.set_style(
+    indicatif::ProgressStyle::default_spinner()
+      .tick_strings(&["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"])
+      .template("{spinner:.cyan} {msg}")
+      .unwrap()
+  );
+  spinner.enable_steady_tick(Duration::from_millis(80));
+  spinner.set_message(format!("Fetching {} component from {}", component_name, repo_name));
 
   let temp_dir = temp_dir().join(format!("yewi_{}", component_name));
 
@@ -136,19 +142,31 @@ pub fn download_component(component_name: &str, target_dir: &Path) -> Result<(),
   let files = fetch_dir_contents(&repo_owner, &repo_name, &repo_branch, &component_path)?;
 
   if files.is_empty() {
+    spinner.finish_and_clear();
     return Err(format!("Component '{}' not found", component_name).into());
   }
 
-  for file in files {
+  spinner.finish_and_clear();
+
+  let pb = ProgressBar::new(files.len() as u64);
+  pb.set_style(
+    ProgressStyle::default_bar()
+      .template("{spinner:.cyan} {msg} {bar:40.cyan/blue} {pos}/{len}")
+      .unwrap()
+      .tick_strings(&["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"])
+  );
+  pb.set_message("Downloading component files");
+
+  for file in &files {
     let dest_path = temp_dir.join(&file.name);
     download_file(&file.download_url, &dest_path)?;
-    println!("Downloaded file: {}", file.name);
+    pb.inc(1);
   }
+  pb.finish_and_clear();
+
   copy_component_files(&temp_dir, target_dir, component_name)?;
 
   fs::remove_dir_all(&temp_dir).ok();
-
-  println!("Component '{}' added to your project.", component_name);
 
   Ok(())
 }

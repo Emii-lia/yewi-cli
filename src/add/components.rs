@@ -24,7 +24,6 @@ pub fn update_components_mod(project_dir: &Path, component_name: &str) -> Result
   }
 
   fs::write(&mod_path, content)?;
-  println!("Updated src/components/mod.rs");
 
   Ok(())
 }
@@ -48,7 +47,7 @@ pub fn update_components_scss(project_dir: &Path, component_name: &str) -> Resul
   }
 
   fs::write(&scss_path, content)?;
-  println!("Updated src/styles/components.scss");
+
 
   Ok(())
 }
