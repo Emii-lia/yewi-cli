@@ -96,7 +96,7 @@ fn copy_component_files(
   target: &Path,
   component_name: &str,
 ) -> Result<(), Box<dyn Error>> {
-  let dest_component_dir = target.join("utils").join(component_name);
+  let dest_component_dir = target.join("src").join("components").join(component_name);
   if dest_component_dir.exists() {
     fs::remove_dir_all(&dest_component_dir)?;
   }
