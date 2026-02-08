@@ -3,6 +3,8 @@ use std::error::Error;
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
+use std::time::Duration;
+use indicatif::ProgressBar;
 use crate::init::download_file::download_file;
 use crate::init::extract_zip::extract_zip;
 use crate::utils::constants::get_repo_config;
@@ -16,6 +18,7 @@ fn is_curl_available() -> bool {
     .map(|output| output.status.success())
     .unwrap_or(false)
 }
+
 pub(crate) fn clone_with_git(project_dir: &PathBuf) -> Result<(), Box<dyn Error>> {
   let (repo_owner, _repo_name, _repo_branch, _raw_github_url) = get_repo_config();
   let repo_url = format!(
@@ -24,10 +27,10 @@ pub(crate) fn clone_with_git(project_dir: &PathBuf) -> Result<(), Box<dyn Error>
   );
   let parent_dir = project_dir
     .parent()
-    .ok_or("Failed to get parent directory")?;
+    .ok_or("❌ Failed to determine parent directory for clone operation")?;
   let project_name = project_dir
     .file_name()
-    .ok_or("Failed to get project directory name")?;
+    .ok_or("❌ Failed to extract project name from directory path")?;
 
   let git_paths = vec!["git", "/usr/bin/git", "/usr/local/bin/git"];
 
@@ -48,7 +51,7 @@ pub(crate) fn clone_with_git(project_dir: &PathBuf) -> Result<(), Box<dyn Error>
         } else {
           let stderr = String::from_utf8_lossy(&output.stderr);
           return Err(format!(
-            "Failed to clone: {}\n{}",
+            "❌ Failed to clone repository from: {}\n   Error: {}",
             &repo_url, stderr
           ).into());
         }
@@ -59,14 +62,13 @@ pub(crate) fn clone_with_git(project_dir: &PathBuf) -> Result<(), Box<dyn Error>
     }
   }
 
-  Err("Git not found in any standard location. Please install git: https://git-scm.com/downloads".into())
+  Err("❌ Git not found in any standard location.\n   Please install git from: https://git-scm.com/downloads".into())
 }
 
 pub(crate) fn clone_with_api(project_dir: &PathBuf) -> Result<(), Box<dyn Error>> {
   if !is_curl_available() {
     return Err(
-      "curl is not installed. Please install curl or use git to clone the template.\n\
-       Install: https://curl.se/download.html".into()
+      "❌ curl is not installed. Required for template download.\n   Please install curl from: https://curl.se/download.html".into()
     );
   }
 
@@ -78,10 +80,22 @@ pub(crate) fn clone_with_api(project_dir: &PathBuf) -> Result<(), Box<dyn Error>
     repo_owner, TEMPLATE_REPO, repo_branch
   );
 
-  println!("  From: {}", zip_url);
+  let spinner = ProgressBar::new_spinner();
+  spinner.set_style(
+    indicatif::ProgressStyle::default_spinner()
+      .tick_strings(&["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"])
+      .template("{spinner:.cyan} {msg}")
+      .unwrap()
+  );
+  spinner.enable_steady_tick(Duration::from_millis(80));
+  spinner.set_message("Downloading template from GitHub...");
+
   download_file(&zip_url, &temp_zip)?;
 
+  spinner.set_message("Extracting template files...");
   extract_zip(&temp_zip, project_dir)?;
+
+  spinner.finish_and_clear();
 
   fs::remove_file(&temp_zip).ok();
 
