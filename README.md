@@ -1,10 +1,20 @@
 # Yewi-Kit CLI
 
 [Yewi-cli](https://crates.io/crates/yewi-cli) is a command-line tool for managing UI components in your Yew projects, inspired by shadcn/ui.
+It allows you to create new projects from a pre-configured template, add components from the [yewi-kit](https://yewi.pages.dev) repository, and more.
+The CLI is written in Rust and uses [yew](https://crates.io/crates/yew) for the frontend.
+
+## Why Yewi?
+Yewi provides a streamlined workflow for building Yew applications with a focus on reusable UI components. It offers:
+- A pre-configured project template with Tailwind CSS and SCSS support
+- Add what you need, without bloating your project with unnecessary dependencies.
+- Easy component management with full ownership of the component source code in your project.
+- Easy customisation with Tailwind CSS variables and SCSS mixins.
 
 ## Features
 
-- **Create new projects** from a pre-configured template
+- **Create new projects** from a pre-configured template and colour themes
+- **List and search components** from the yewi-kit repository
 - **Add components** from the yewi-kit repository to any yewi project
 - **Automatic style imports** - component styles are auto-imported
 - **Zero config** - all setup is handled by the CLI
@@ -46,8 +56,22 @@ Add any component from [yewi-kit](https://yewi.pages.dev):
 
 ```bash
 yewi add button
-yewi add input
-yewi add badge
+yewi add input badge
+```
+
+Or 
+```bash
+yewi add
+? Select components:   
+> [ ] avatar
+  [ ] avatar_group
+  [ ] badge
+  [ ] button
+  [ ] card
+  [ ] carousel
+v [ ] checkbox
+[↑↓ to move, space to select one, → to all, ← to none, type to filter]
+
 ```
 
 This automatically:
@@ -85,11 +109,33 @@ v Blue
 ```bash
 yewi add button
 yewi add input
-yewi add select
-yewi add badge
-yewi add card
+yewi add badge card
 ```
+Or 
+```bash
+yewi add
+? Select components:   
+> [ ] avatar
+  [ ] avatar_group
+  [ ] badge
+  [ ] button
+  [ ] card
+  [ ] carousel
+v [ ] checkbox
+[↑↓ to move, space to select one, → to all, ← to none, type to filter]
+```
+### List Available Components
+```bash
+yewi list
+- avatar
+- avatar_group
+- badge
+- button
+- card
+- carousel
+...
 
+```
 ## Project Structure
 
 After `yewi new`, your project will have this structure:
