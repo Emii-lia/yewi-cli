@@ -1,13 +1,13 @@
 [package]
 name = "yewi-cli"
-version = "1.1.1"
+version = "1.2.1"
 edition = "2024"
 authors = ["Fiaro fiaromiangaly@gmail.com"]
 description = "CLI tool for managing yewi-kit components in Yew projects"
 homepage = "https://yewi.pages.dev"
 repository = "https://github.com/Emii-lia/yewi-cli"
-keywords = ["yew", "ui-kit", "react", "components", "wasm"]
-categories = ["command-line-utilities", "development-tools::cargo-plugins"]
+keywords = ["yew", "ui-kit", "web-development", "components", "wasm"]
+categories = ["command-line-utilities", "development-tools::cargo-plugins", "gui", "web-programming", "wasm"]
 license = "MIT"
 
 [dependencies]
