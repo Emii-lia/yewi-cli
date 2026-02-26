@@ -8,6 +8,7 @@ use std::fs;
 use std::path::{PathBuf};
 use indicatif::ProgressBar;
 use std::time::Duration;
+use crate::handlers::inquire_i18n::inquire_i18n;
 use crate::handlers::inquire_init::inquire_init;
 use crate::init::git::{clone_with_api, clone_with_git, is_git_available};
 use crate::init::update_config::{update_cargo_toml, update_package_json, update_theme};
@@ -28,10 +29,13 @@ pub(crate) fn create(project_name: &str) -> Result<(), Box<dyn Error>> {
   let color = inquire_init()
     .map_err(|e| format!("❌ Failed to initialize project settings: {}", e))?;
 
+  let has_i18n = inquire_i18n()
+    .map_err(|e| format!("❌ Failed to determine i18n settings: {}", e))?;
+
   fs::create_dir_all(&project_dir)
     .map_err(|e| format!("❌ Failed to create project directory: {}", e))?;
 
-  clone_template(&project_dir)?;
+  clone_template(&project_dir, has_i18n)?;
 
   let spinner = ProgressBar::new_spinner();
   spinner.set_style(
@@ -63,7 +67,7 @@ pub(crate) fn create(project_name: &str) -> Result<(), Box<dyn Error>> {
   Ok(())
 }
 
-fn clone_template(project_dir: &PathBuf) -> Result<(), Box<dyn Error>> {
+fn clone_template(project_dir: &PathBuf, has_i18n: bool) -> Result<(), Box<dyn Error>> {
   let spinner = ProgressBar::new_spinner();
   spinner.set_style(
     indicatif::ProgressStyle::default_spinner()
@@ -76,20 +80,20 @@ fn clone_template(project_dir: &PathBuf) -> Result<(), Box<dyn Error>> {
   let git_available = is_git_available();
 
   if git_available {
-    match clone_with_git(project_dir) {
+    match clone_with_git(project_dir, has_i18n) {
       Ok(_) => {
         spinner.set_message("Downloading template with git...");
         spinner.finish_and_clear();
       }
       Err(_) => {
         println!("Downloading template via API...");
-        clone_with_api(project_dir)?;
+        clone_with_api(project_dir, has_i18n)?;
         spinner.finish_and_clear();
       }
     }
   } else {
     println!("Downloading template via API...");
-    clone_with_api(project_dir)?;
+    clone_with_api(project_dir, has_i18n)?;
     spinner.finish_and_clear();
   }
 

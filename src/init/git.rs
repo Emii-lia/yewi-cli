@@ -10,6 +10,7 @@ use crate::init::extract_zip::extract_zip;
 use crate::utils::constants::get_repo_config;
 
 const TEMPLATE_REPO: &str = "yew-app-template";
+const TEMPLATE_REPO_I18N: &str = "yewi18n-app-template";
 
 fn is_curl_available() -> bool {
   Command::new("curl")
@@ -19,11 +20,12 @@ fn is_curl_available() -> bool {
     .unwrap_or(false)
 }
 
-pub(crate) fn clone_with_git(project_dir: &PathBuf) -> Result<(), Box<dyn Error>> {
+pub(crate) fn clone_with_git(project_dir: &PathBuf, has_i18n: bool) -> Result<(), Box<dyn Error>> {
   let (repo_owner, _repo_name, _repo_branch, _raw_github_url) = get_repo_config();
+  let repo = if has_i18n { TEMPLATE_REPO_I18N } else { TEMPLATE_REPO };
   let repo_url = format!(
     "https://github.com/{}/{}.git",
-    repo_owner, TEMPLATE_REPO
+    repo_owner, repo
   );
   let parent_dir = project_dir
     .parent()
@@ -65,7 +67,7 @@ pub(crate) fn clone_with_git(project_dir: &PathBuf) -> Result<(), Box<dyn Error>
   Err("❌ Git not found in any standard location.\n   Please install git from: https://git-scm.com/downloads".into())
 }
 
-pub(crate) fn clone_with_api(project_dir: &PathBuf) -> Result<(), Box<dyn Error>> {
+pub(crate) fn clone_with_api(project_dir: &PathBuf, has_i18n: bool) -> Result<(), Box<dyn Error>> {
   if !is_curl_available() {
     return Err(
       "❌ curl is not installed. Required for template download.\n   Please install curl from: https://curl.se/download.html".into()
@@ -75,9 +77,10 @@ pub(crate) fn clone_with_api(project_dir: &PathBuf) -> Result<(), Box<dyn Error>
   let (repo_owner, _repo_name, repo_branch, _raw_github_url) = get_repo_config();
   let temp_zip = temp_dir().join("yew_app_template.zip");
 
+  let repo = if has_i18n { TEMPLATE_REPO_I18N } else { TEMPLATE_REPO };
   let zip_url = format!(
     "https://github.com/{}/{}/archive/refs/heads/{}.zip",
-    repo_owner, TEMPLATE_REPO, repo_branch
+    repo_owner, repo, repo_branch
   );
 
   let spinner = ProgressBar::new_spinner();
