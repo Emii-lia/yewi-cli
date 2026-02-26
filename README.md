@@ -6,14 +6,14 @@ The CLI is written in Rust and uses [yew](https://crates.io/crates/yew) for the 
 
 ## Why Yewi?
 Yewi provides a streamlined workflow for building Yew applications with a focus on reusable UI components. It offers:
-- A pre-configured project template with Tailwind CSS and SCSS support
+- A pre-configured project template with `Tailwind CSS`, `SCSS` and `i18nrs` support
 - Add what you need, without bloating your project with unnecessary dependencies.
 - Easy component management with full ownership of the component source code in your project.
 - Easy customisation with Tailwind CSS variables and SCSS mixins.
 
 ## Features
 
-- **Create new projects** from a pre-configured template and colour themes
+- **Create new projects** from a pre-configured template and colour themes, with `i18nrs` support.
 - **List and search components** from the yewi-kit repository
 - **Add components** from the yewi-kit repository to any yewi project
 - **Automatic style imports** - component styles are auto-imported
@@ -102,6 +102,11 @@ yewi new my-project
   Emerald
 v Blue
 [↑↓ to move, enter to select, type to filter]
+```
+
+Then you'll have the choice to add `i18nrs` support for your project:
+```bash
+> Do you want to use i18nrs? (y/N)
 ```
 
 ### Add a Component
