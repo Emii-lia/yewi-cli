@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::error::Error;
 use std::path::PathBuf;
 use github::download_component;
@@ -5,11 +6,13 @@ use crate::add::components::{component_exists, update_components_mod, update_com
 
 mod github;
 pub mod components;
+mod metadata;
 
 use indicatif::ProgressBar;
 use std::time::Duration;
+use crate::add::metadata::fetch_metadata;
 
-pub(crate) fn add(component_name: &str) -> Result<(), Box<dyn Error>> {
+pub(crate) fn add(component_name: &str, added: &mut HashSet<String>) -> Result<(), Box<dyn Error>> {
   let project_dir = PathBuf::from(".");
 
   if !project_dir.join("src").exists() {
@@ -21,9 +24,23 @@ pub(crate) fn add(component_name: &str) -> Result<(), Box<dyn Error>> {
     return Ok(());
   }
 
-  download_component(component_name, &project_dir)?;
+  if added.contains(component_name) {
+    return Ok(());
+  }
+  added.insert(component_name.to_string());
+
+  let metadata = fetch_metadata(component_name)?;
 
   let spinner = ProgressBar::new_spinner();
+  if !metadata.dependencies.is_empty() {
+    spinner.set_message(format!("Adding dependencies for '{}'...", component_name));
+    for dep in metadata.dependencies {
+      add(&dep, added)?;
+    }
+  }
+
+  download_component(component_name, &project_dir)?;
+
   spinner.set_style(
     indicatif::ProgressStyle::default_spinner()
       .tick_strings(&["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"])
