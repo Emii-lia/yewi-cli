@@ -59,7 +59,7 @@ fn fetch_dir_contents(
   let mut files = Vec::new();
 
   for item in items {
-    if item.item_type == "file" {
+    if item.item_type == "file" && !item.name.ends_with(".toml") {
       files.push(FileInfo {
         name: item.name,
         download_url: item.download_url,
