@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::error::Error;
 use clap::{Parser, Subcommand};
 use crate::add::add;
@@ -62,7 +63,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         select_components(components).expect("Failed to select components. Please try again.")
       });
       for component_name in component_names {
-        add(&component_name)?;
+        let mut added = HashSet::new();
+        add(&component_name, &mut added)?;
       };
     },
     Commands::List => {
