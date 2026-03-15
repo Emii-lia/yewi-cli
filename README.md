@@ -1,7 +1,7 @@
 # Yewi-Kit CLI
 
 [Yewi-cli](https://crates.io/crates/yewi-cli) is a command-line tool for managing UI components in your Yew projects, inspired by shadcn/ui.
-It allows you to create new projects from a pre-configured template, add components from the [yewi-kit](https://yewi.pages.dev) repository, and more.
+It allows you to create new projects from a pre-configured template, add components from the [yewi-kit](https://yewi.fiaro.app) repository, and more.
 The CLI is written in Rust and uses [yew](https://crates.io/crates/yew) for the frontend.
 
 ## Why Yewi?
@@ -52,7 +52,7 @@ Your project is now ready to go.
 
 ### 2. Add Components
 
-Add any component from [yewi-kit](https://yewi.pages.dev):
+Add any component from [yewi-kit](https://yewi.fiaro.app):
 
 ```bash
 yewi add button
