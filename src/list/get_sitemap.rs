@@ -4,7 +4,7 @@ use std::process::Command;
 pub(crate) fn get_sitemap() -> Result<String, Box<dyn Error>> {
   let output = Command::new("curl")
     .arg("-s")
-    .arg("https://yewi.pages.dev/sitemap.xml")
+    .arg("https://yewi.fiaro.app/sitemap.xml")
     .output()?;
   if !output.status.success() {
     let stderr = String::from_utf8_lossy(&output.stderr);
