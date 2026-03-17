@@ -246,7 +246,7 @@ body {
 
 Make sure the component exists in the yewi-kit repository:
 - Check source: https://github.com/Emii-lia/yewi-kit
-- Check docs: https://yewi.pages.dev
+- Check docs: https://yewi.fiaro.app
 
 ### Styles not applied
 
@@ -283,4 +283,4 @@ For issues, questions, or suggestions, please open an issue on the [GitHub repos
 
 ## Yewi-Kit website
 
-Visit the [Yewi-Kit website](https://yewi.pages.dev) for documentation, examples, and more information about the components available.
+Visit the [Yewi-Kit website](https://yewi.fiaro.app) for documentation, examples, and more information about the components available.
