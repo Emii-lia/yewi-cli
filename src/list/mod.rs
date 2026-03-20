@@ -3,6 +3,7 @@ use crate::list::parse_sitemap::parse_sitemap;
 
 mod get_sitemap;
 mod parse_sitemap;
+pub mod test;
 
 pub fn list() -> Vec<String> {
   let sitemap = match get_sitemap() {
