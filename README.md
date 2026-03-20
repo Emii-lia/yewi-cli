@@ -109,6 +109,11 @@ Then you'll have the choice to add `i18nrs` support for your project:
 > Do you want to use i18nrs? (y/N)
 ```
 
+Or directly:
+```bash
+yewi new my-project --theme slate --i18n
+```
+
 ### Add a Component
 
 ```bash
