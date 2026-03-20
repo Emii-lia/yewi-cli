@@ -2,6 +2,7 @@ mod extract_zip;
 mod download_file;
 mod git;
 mod update_config;
+pub mod test;
 
 use std::error::Error;
 use std::fs;
