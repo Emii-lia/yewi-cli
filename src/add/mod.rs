@@ -7,6 +7,7 @@ use crate::add::components::{component_exists, update_components_mod, update_com
 mod github;
 pub mod components;
 mod metadata;
+pub mod test;
 
 use indicatif::ProgressBar;
 use std::time::Duration;
