@@ -1,3 +1,4 @@
+use clap::ArgAction;
 use std::collections::HashSet;
 use std::error::Error;
 use clap::{Parser, Subcommand};
@@ -22,7 +23,11 @@ enum Commands {
     override_usage = "yewi new <project_name>",
   )]
   New {
-    project_name: String
+    project_name: String,
+    #[arg(long, short, required = false, help = "Optional theme color for the new project. If not specified, you will be prompted to choose a theme interactively.")]
+    theme: Option<String>,
+    #[arg(long, short, required = false, action = ArgAction::SetTrue ,help = "Optional i18n setting for the new project. If not specified, you will be prompted to choose a i18n setting interactively.")]
+    i18n: Option<bool>,
   },
   #[command(
     aliases = &["install", "i"],
@@ -54,8 +59,8 @@ fn main() -> Result<(), Box<dyn Error>> {
   let cli = Cli::parse();
 
   match cli.command {
-    Commands::New { project_name } => {
-      create(&project_name)?;
+    Commands::New { project_name, theme, i18n } => {
+      create(&project_name, theme, i18n)?;
     }
     Commands::Add { component_names } => {
       let component_names = component_names.unwrap_or_else(|| {

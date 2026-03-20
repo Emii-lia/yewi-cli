@@ -27,6 +27,19 @@ impl Color {
   pub fn get_colors() -> Vec<Color> {
     Color::iter().collect()
   }
+  pub fn from_str(s: &str) -> Option<Color> {
+    match s.to_lowercase().as_str() {
+      "slate" => Some(Color::Slate),
+      "gray" => Some(Color::Gray),
+      "zinc" => Some(Color::Zinc),
+      "neutral" => Some(Color::Neutral),
+      "stone" => Some(Color::Stone),
+      "emerald" => Some(Color::Emerald),
+      "blue" => Some(Color::Blue),
+      "sky" => Some(Color::Sky),
+      _ => None,
+    }
+  }
 }
 
 impl Display for Color {
