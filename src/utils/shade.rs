@@ -1,9 +1,9 @@
-use std::collections::HashMap;
+use std::collections::{BTreeMap};
 use std::fmt::{Display, Error};
 
 pub type ShadeUKey = u32;
 
-#[derive(Eq, Hash, PartialEq, Copy, Clone, Debug)]
+#[derive(Eq, Ord, PartialOrd, PartialEq, Copy, Clone, Debug)]
 pub enum ShadeKey {
   U(ShadeUKey),
   Default
@@ -18,34 +18,43 @@ impl Display for ShadeKey {
   }
 }
 
-pub fn is_valid_hex(hex: &str) -> bool {
-  hex.starts_with("#") && hex.chars().skip(1).all(|c| c.is_digit(16))
+fn has_prefix(s: &str, prefix: &str) -> bool {
+  s.starts_with(prefix)
 }
-pub fn shades_of(hex: &str) -> Result<HashMap<ShadeKey, String>, String> {
+pub fn is_valid_hex(hex: &str) -> bool {
+  (hex.starts_with("#") && hex.chars().skip(1).all(|c| c.is_digit(16)))
+  || hex.chars().all(|c| c.is_digit(16))
+}
+pub fn shades_of(hex: &str) -> Result<BTreeMap<ShadeKey, String>, String> {
   if !is_valid_hex(hex) {
     return Err(format!("Invalid hex: {}", hex));
   }
-  let base_color = hex_to_rgb_array(hex);
+  let mut hex_mut = hex.to_string();
+
+  if !has_prefix(hex_mut.as_str(), "#") {
+    hex_mut = format!("#{}", hex_mut);
+  }
+  let base_color = hex_to_rgb_array(hex_mut.as_str());
   let black: Vec<u8> = vec![0, 0, 0];
   let white: Vec<u8> = vec![255, 255, 255];
 
   let shades: Vec<ShadeUKey> = vec![50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
 
-  let mut result = HashMap::new();
+  let mut result = BTreeMap::new();
   if !result.contains_key(&ShadeKey::Default) {
-    result.insert(ShadeKey::Default, hex.to_string());
+    result.insert(ShadeKey::Default, hex_mut.to_string());
   }
 
   for shade in shades.iter() {
     if *shade == 500 {
-      result.insert(ShadeKey::U(500), hex.to_string());
+      result.insert(ShadeKey::U(500), hex_mut.to_string());
     } else {
       if *shade < 500 {
         let percentage = (500 - shade) as f32 / 500.0;
         result.insert(ShadeKey::U(*shade), get_color(percentage, white.clone(), base_color.clone()));
       } else {
         let percentage = (shade - 500) as f32 / 500.0;
-        result.insert(ShadeKey::U(*shade), get_color(percentage, base_color.clone(), black.clone()));
+        result.insert(ShadeKey::U(*shade), get_color(percentage, black.clone(), base_color.clone()));
       }
     }
   }
@@ -76,7 +85,7 @@ fn hex_to_rgb_array(hex: &str) -> Vec<u8> {
 
 fn get_color(percentage: f32, start: Vec<u8>, end: Vec<u8>) -> String {
   let rgb = end.iter().enumerate().map(|(index, channel)| {
-    let rgb_channel = (*channel as f32) + percentage * (start[index] - channel) as f32;
+    let rgb_channel = (*channel as f32) + percentage * ((start[index] as f32) - (*channel as f32));
     rgb_channel.round()
   });
 

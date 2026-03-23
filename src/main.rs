@@ -1,11 +1,12 @@
 use clap::ArgAction;
-use std::collections::HashSet;
+use std::collections::{HashSet};
 use std::error::Error;
 use clap::{Parser, Subcommand};
 use crate::add::add;
 use crate::handlers::select_components::select_components;
 use crate::init::create;
 use crate::list::list;
+use crate::utils::shade::{shades_of};
 
 mod add;
 mod utils;
@@ -39,7 +40,12 @@ enum Commands {
     component_names: Option<Vec<String>>
   },
   #[command(about = "List all available Yewi components")]
-  List
+  List,
+
+  #[command(about = "Convert Hex to Shade")]
+  Convert {
+    hex: String
+  }
 }
 #[derive(Parser)]
 #[command(name = "yewi")]
@@ -75,6 +81,19 @@ fn main() -> Result<(), Box<dyn Error>> {
     Commands::List => {
       for component in list::list() {
         println!("- {}", component);
+      }
+    },
+    Commands::Convert { hex } => {
+      let shade = shades_of(hex.as_str());
+      match shade {
+        Ok(sh) => {
+          for (key, value) in sh {
+            println!("{}: {}", key, value);
+          }
+        }
+        Err(_) => {
+          println!("Failed to convert hex to Shade");
+        }
       }
     }
   }

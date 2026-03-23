@@ -8,7 +8,8 @@ pub enum Color {
   Stone,
   Emerald,
   Blue,
-  Sky
+  Sky,
+  Custom(String),
 }
 
 impl Color {
@@ -22,22 +23,24 @@ impl Color {
       Color::Emerald,
       Color::Blue,
       Color::Sky,
+      Color::Custom(String::from("Custom")),
     ].into_iter()
   }
   pub fn get_colors() -> Vec<Color> {
     Color::iter().collect()
   }
-  pub fn from_str(s: &str) -> Option<Color> {
+  pub fn from_str(s: &str) -> Color {
     match s.to_lowercase().as_str() {
-      "slate" => Some(Color::Slate),
-      "gray" => Some(Color::Gray),
-      "zinc" => Some(Color::Zinc),
-      "neutral" => Some(Color::Neutral),
-      "stone" => Some(Color::Stone),
-      "emerald" => Some(Color::Emerald),
-      "blue" => Some(Color::Blue),
-      "sky" => Some(Color::Sky),
-      _ => None,
+      "slate" => Color::Slate,
+      "gray" => Color::Gray,
+      "zinc" => Color::Zinc,
+      "neutral" => Color::Neutral,
+      "stone" => Color::Stone,
+      "emerald" => Color::Emerald,
+      "blue" => Color::Blue,
+      "sky" => Color::Sky,
+      "custom" => Color::Custom(String::from("Custom")),
+      _ => Color::Custom(s.to_string()),
     }
   }
 }
@@ -53,6 +56,7 @@ impl Display for Color {
       Color::Emerald => write!(f, "Emerald"),
       Color::Blue => write!(f, "Blue"),
       Color::Sky => write!(f, "Sky"),
+      Color::Custom(_s) => write!(f, "Custom"),
     }
   }
 }

@@ -3,6 +3,7 @@ use std::fs;
 use std::path::PathBuf;
 use regex::Regex;
 use crate::types::color::Color;
+use crate::utils::shade::{is_valid_hex, shades_of, ShadeKey};
 
 pub(crate) fn update_cargo_toml(project_dir: &PathBuf) -> Result<(), Box<dyn Error>> {
   let cargo_toml_path = project_dir.join("Cargo.toml");
@@ -36,17 +37,42 @@ pub(crate) fn update_package_json(project_dir: &PathBuf) -> Result<(), Box<dyn E
   Ok(())
 }
 
-pub(crate) fn update_theme(project_dir: &PathBuf, color: Color) -> Result<(), Box<dyn Error>> {
+pub(crate) fn update_theme(project_dir: &PathBuf, color: String) -> Result<(), Box<dyn Error>> {
   let style_path = project_dir.join("src/styles/main.scss");
-  let shades: Vec<i32> = vec![50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
   let mut style_content = fs::read_to_string(&style_path)
-    .map_err(|e| format!("❌ Failed to read styles/main.scss: {}", e))?;
+    .map_err(|e| format!("Failed to read styles/main.scss: {}", e))?;
 
-  for shade in &shades {
-    let color_value = format!("theme(\"colors.{}.{}\")", &color.to_string().to_lowercase(), shade);
-    let re = Regex::new(&format!(r"--primary-{}\s*:\s*[^;]+;", shade))
-      .map_err(|e| format!("❌ Failed to compile regex pattern: {}", e))?;
-    style_content = re.replace_all(&style_content, format!("--primary-{}: {};", shade, &color_value)).into_owned();
+  match Color::from_str(&color) {
+    Color::Custom(c) => {
+      if is_valid_hex(&c) {
+        let shades = shades_of(&c)
+          .map_err(|e| format!("Failed to generate shades for custom color: {}", e))?;
+        for (shade, value) in shades {
+          match shade {
+            ShadeKey::U(key) => {
+              let re =Regex::new(&format!(r"--primary-{}\s*:\s*[^;]+;", key))
+                .map_err(|e| format!("Failed to compile regex pattern: {}", e))?;
+              style_content = re.replace_all(&style_content, format!("--primary-{}: {};", shade, value)).into_owned();
+            }
+            ShadeKey::Default => {
+              let re = Regex::new(r"--primary\s*:\s*[^;]+;")
+                .map_err(|e| format!("Failed to compile regex pattern: {}", e))?;
+              style_content = re.replace_all(&style_content, format!("--primary: {};", value)).into_owned();
+            }
+          }
+        }
+      }
+    }
+    _ => {
+      let shades: Vec<i32> = vec![50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
+
+      for shade in &shades {
+        let color_value = format!("theme(\"colors.{}.{}\")", &color.to_string().to_lowercase(), shade);
+        let re = Regex::new(&format!(r"--primary-{}\s*:\s*[^;]+;", shade))
+          .map_err(|e| format!("Failed to compile regex pattern: {}", e))?;
+        style_content = re.replace_all(&style_content, format!("--primary-{}: {};", shade, &color_value)).into_owned();
+      }
+    }
   }
 
   fs::write(&style_path, style_content)

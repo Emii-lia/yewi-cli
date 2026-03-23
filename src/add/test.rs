@@ -53,7 +53,7 @@ fn add_component_to_existing_project() {
   create(
     project.to_str().unwrap(),
     Some("sky".into()),
-    Some(false)
+    Some(true)
   ).unwrap();
 
   std::env::set_current_dir(project.clone()).unwrap();
@@ -78,7 +78,7 @@ fn add_existing_component() {
   create(
     project.to_str().unwrap(),
     Some("sky".into()),
-    Some(false)
+    Some(true)
   ).unwrap();
 
   std::env::set_current_dir(project.clone()).unwrap();
@@ -97,13 +97,13 @@ fn add_dependencies_before_component() {
   create(
     project.to_str().unwrap(),
     Some("sky".into()),
-    Some(false)
+    Some(true)
   ).unwrap();
 
   std::env::set_current_dir(project.clone()).unwrap();
   let mut added = HashSet::new();
 
-  add("modal", &mut added);
+  add("modal", &mut added).unwrap();
 
   assert!(project.join("src").join("components").join("button").exists());
   assert!(project.join("src").join("components").join("modal").exists());
