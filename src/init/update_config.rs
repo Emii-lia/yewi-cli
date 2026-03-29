@@ -37,7 +37,7 @@ pub(crate) fn update_package_json(project_dir: &PathBuf) -> Result<(), Box<dyn E
   Ok(())
 }
 
-pub(crate) fn update_theme(project_dir: &PathBuf, color: String) -> Result<(), Box<dyn Error>> {
+pub fn update_theme(project_dir: &PathBuf, color: String) -> Result<(), Box<dyn Error>> {
   let style_path = project_dir.join("src/styles/main.scss");
   let mut style_content = fs::read_to_string(&style_path)
     .map_err(|e| format!("Failed to read styles/main.scss: {}", e))?;
@@ -54,11 +54,7 @@ pub(crate) fn update_theme(project_dir: &PathBuf, color: String) -> Result<(), B
                 .map_err(|e| format!("Failed to compile regex pattern: {}", e))?;
               style_content = re.replace_all(&style_content, format!("--primary-{}: {};", shade, value)).into_owned();
             }
-            ShadeKey::Default => {
-              let re = Regex::new(r"--primary\s*:\s*[^;]+;")
-                .map_err(|e| format!("Failed to compile regex pattern: {}", e))?;
-              style_content = re.replace_all(&style_content, format!("--primary: {};", value)).into_owned();
-            }
+            ShadeKey::Default => {}
           }
         }
       }
