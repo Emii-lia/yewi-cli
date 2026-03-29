@@ -1,7 +1,7 @@
   mod extract_zip;
   mod download_file;
   mod git;
-  mod update_config;
+  pub mod update_config;
   pub mod test;
   pub mod theming;
 
