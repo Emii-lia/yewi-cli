@@ -2,11 +2,9 @@ use std::collections::HashSet;
 use std::env::temp_dir;
 use std::fs;
 use std::path::PathBuf;
-use std::sync::Mutex;
 use crate::add::add;
 use crate::init::create;
-
-static CWD_LOCK: Mutex<()> = Mutex::new(());
+use crate::utils::path::CWD_LOCK;
 
 struct ProjectBuf {
   pub path: PathBuf,
@@ -33,8 +31,9 @@ impl Drop for ProjectBuf {
 
 #[test]
 fn add_component_to_invalid_project_structure() {
-  let _guard = CWD_LOCK.lock().unwrap();
+  let _guard = CWD_LOCK.lock().unwrap_or_else(|e| e.into_inner());
   let project = ProjectBuf::new("yew-test-add-invalid-project-structure");
+  let original_cwd = std::env::current_dir().unwrap();
   fs::create_dir_all(&project.path).unwrap();
 
   std::env::set_current_dir(&project.path).unwrap();
@@ -42,14 +41,16 @@ fn add_component_to_invalid_project_structure() {
   let result = add("button", &mut HashSet::new());
   assert!(result.is_err());
   assert!(result.unwrap_err().to_string().contains("must be run inside a Yewi project directory"));
+  std::env::set_current_dir(&original_cwd).unwrap();
 }
 
 #[test]
 fn add_component_to_existing_project() {
-  let _guard = CWD_LOCK.lock().unwrap();
+  let _guard = CWD_LOCK.lock().unwrap_or_else(|e| e.into_inner());
   let project_path = ProjectBuf::new("yew-test-add-existing-project");
   let project = project_path.path.clone();
-
+  let original_cwd = std::env::current_dir().unwrap();
+  
   create(
     project.to_str().unwrap(),
     Some("sky".into()),
@@ -68,13 +69,16 @@ fn add_component_to_existing_project() {
   assert!(scss_file.exists());
   let content = std::fs::read_to_string(scss_file).unwrap();
   assert!(content.contains("@use \"../components/button/button\";"));
+  std::env::set_current_dir(&original_cwd).unwrap();
 }
 
 #[test]
 fn add_existing_component() {
-  let _guard = CWD_LOCK.lock().unwrap();
+  let _guard = CWD_LOCK.lock().unwrap_or_else(|e| e.into_inner());
   let project_path = ProjectBuf::new("yew-test-add-existing-component");
   let project = project_path.path.clone();
+  let original_cwd = std::env::current_dir().unwrap();
+  
   create(
     project.to_str().unwrap(),
     Some("sky".into()),
@@ -85,14 +89,15 @@ fn add_existing_component() {
   add("button", &mut HashSet::new()).unwrap();
   let result = add("button", &mut HashSet::new());
   assert!(result.is_ok());
-  assert!(fs::remove_dir_all(project).is_ok());
+  std::env::set_current_dir(&original_cwd).unwrap();
 }
 
 #[test]
 fn add_dependencies_before_component() {
-  let _guard = CWD_LOCK.lock().unwrap();
+  let _guard = CWD_LOCK.lock().unwrap_or_else(|e| e.into_inner());
   let project_path = ProjectBuf::new("yew-test-add-dependencies-before-component");
   let project = project_path.path.clone();
+  let original_cwd = std::env::current_dir().unwrap();
 
   create(
     project.to_str().unwrap(),
@@ -108,5 +113,5 @@ fn add_dependencies_before_component() {
   assert!(project.join("src").join("components").join("button").exists());
   assert!(project.join("src").join("components").join("modal").exists());
   assert!(added.contains("button"));
-  assert!(fs::remove_dir_all(project).is_ok());
+  std::env::set_current_dir(&original_cwd).unwrap();
 }
