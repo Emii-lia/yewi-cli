@@ -6,6 +6,7 @@ use crate::add::add;
 use crate::handlers::select_components::select_components;
 use crate::init::create;
 use crate::list::list;
+use crate::update::update;
 use crate::utils::shade::{shades_of};
 
 mod add;
@@ -14,6 +15,7 @@ mod types;
 mod handlers;
 mod init;
 mod list;
+pub mod update;
 
 #[derive(Subcommand)]
 enum Commands {
@@ -45,6 +47,12 @@ enum Commands {
   #[command(about = "Convert Hex to Shade")]
   Convert {
     hex: String
+  },
+
+  #[command(about = "Update Yewi project configuration")]
+  Set {
+    #[arg(long, short, required = false, help = "New theme value. If not specified, you will be prompted to choose a theme interactively.")]
+    theme: Option<String>
   }
 }
 #[derive(Parser)]
@@ -95,6 +103,9 @@ fn main() -> Result<(), Box<dyn Error>> {
           println!("Failed to convert hex to Shade");
         }
       }
+    },
+    Commands::Set { theme } => {
+      update(theme)?;
     }
   }
 
