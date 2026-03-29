@@ -122,7 +122,7 @@ fn create_with_custom_hex_theme() {
         assert!(style.contains(&format!("--primary-{}: {}", key, value)));
       }
       ShadeKey::Default => {
-        assert!(style.contains(&format!("--primary: {}", value)));
+        assert!(style.contains("--primary: var(--primary-500)"))
       }
     }
   }
