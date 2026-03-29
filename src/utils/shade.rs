@@ -18,6 +18,25 @@ impl Display for ShadeKey {
   }
 }
 
+impl ShadeKey {
+  pub fn shades() -> Vec<ShadeKey> {
+    vec![
+      ShadeKey::Default,
+      ShadeKey::U(50),
+      ShadeKey::U(100),
+      ShadeKey::U(200),
+      ShadeKey::U(300),
+      ShadeKey::U(400),
+      ShadeKey::U(500),
+      ShadeKey::U(600),
+      ShadeKey::U(700),
+      ShadeKey::U(800),
+      ShadeKey::U(900),
+      ShadeKey::U(950),
+    ]
+  }
+}
+
 fn has_prefix(s: &str, prefix: &str) -> bool {
   s.starts_with(prefix)
 }
