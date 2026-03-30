@@ -114,6 +114,12 @@ Or directly:
 yewi new my-project --theme slate --i18n
 ```
 
+You can also choose `Custom` then input your primary colour and the CLI will generate a custom colour shades for you ; or simply:
+
+```bash
+yewi new my-project --theme '#ff0000'
+```
+
 ### Add a Component
 
 ```bash
@@ -146,6 +152,13 @@ yewi list
 ...
 
 ```
+
+### Update theme
+
+```bash
+yewi set --theme <theme-name>|<hex-code>
+```
+
 ## Project Structure
 
 After `yewi new`, your project will have this structure:
