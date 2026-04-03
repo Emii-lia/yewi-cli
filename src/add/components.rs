@@ -12,15 +12,10 @@ pub fn update_components_mod(project_dir: &Path, component_name: &str) -> Result
     String::new()
   };
 
-  let mod_declaration = format!("mod {};", component_name);
-  let pub_use = format!("pub use {}::*;", component_name);
+  let mod_declaration = format!("pub mod {};", component_name);
 
   if !content.contains(&mod_declaration) {
     content.push_str(&format!("{}\n", mod_declaration));
-  }
-
-  if !content.contains(&pub_use) {
-    content.push_str(&format!("{}\n", pub_use));
   }
 
   fs::write(&mod_path, content)?;
