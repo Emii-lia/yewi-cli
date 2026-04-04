@@ -64,7 +64,7 @@ fn add_component_to_existing_project() {
   let component_mod = project.join("src").join("components").join("mod.rs");
   assert!(component_mod.exists());
   let content = std::fs::read_to_string(component_mod).unwrap();
-  assert!(content.contains("mod button;"));
+  assert!(content.contains("pub mod button;"));
   let scss_file = project.join("src").join("styles").join("components.scss");
   assert!(scss_file.exists());
   let content = std::fs::read_to_string(scss_file).unwrap();
