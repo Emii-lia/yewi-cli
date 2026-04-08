@@ -1,0 +1,17 @@
+services:
+  yewi-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+    command: cargo build --release
+    working_dir: /app
+  yewi-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+    command: cargo test --release
+    working_dir: /app
