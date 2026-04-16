@@ -3,11 +3,11 @@ use std::collections::{HashSet};
 use std::error::Error;
 use clap::{Parser, Subcommand};
 use crate::add::add;
+use crate::convert::convert;
 use crate::handlers::select_components::select_components;
 use crate::init::create;
 use crate::list::list;
 use crate::update::update;
-use crate::utils::shade::{shades_of};
 
 mod add;
 mod utils;
@@ -16,6 +16,7 @@ mod handlers;
 mod init;
 mod list;
 pub mod update;
+pub mod convert;
 
 #[derive(Subcommand)]
 enum Commands {
@@ -46,7 +47,9 @@ enum Commands {
 
   #[command(about = "Convert Hex to Shade")]
   Convert {
-    hex: String
+    hex: String,
+    #[arg(long, short, required = false, action = ArgAction::SetTrue ,help = "Optional flag to enable colored output. If not specified, the output will be plain text.")]
+    colored: Option<bool>
   },
 
   #[command(about = "Update Yewi project configuration")]
@@ -91,17 +94,14 @@ fn main() -> Result<(), Box<dyn Error>> {
         println!("- {}", component);
       }
     },
-    Commands::Convert { hex } => {
-      let shade = shades_of(hex.as_str());
-      match shade {
-        Ok(sh) => {
-          for (key, value) in sh {
-            println!("{}: {}", key, value);
-          }
+    Commands::Convert { hex, colored } => {
+      let colorized_shades = convert(hex, colored);
+      if let Ok(colorized_shades) = colorized_shades {
+        for (shade, hex) in colorized_shades {
+          println!("{}: {}", shade, hex);
         }
-        Err(_) => {
-          println!("Failed to convert hex to Shade");
-        }
+      } else {
+        println!("Failed to convert hex to shades");
       }
     },
     Commands::Set { theme } => {
