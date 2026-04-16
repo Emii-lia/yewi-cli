@@ -159,6 +159,15 @@ yewi list
 yewi set --theme <theme-name>|<hex-code>
 ```
 
+### Custom theme shades preview
+
+You can preview the colour shades of your custom theme by running the following command:
+
+```bash
+yewi convert <hex-code> --colored
+```
+`--colored` option will display the shades in the terminal with their respective colours
+
 ## Project Structure
 
 After `yewi new`, your project will have this structure:

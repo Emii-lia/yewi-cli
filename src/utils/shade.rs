@@ -87,7 +87,11 @@ fn hex_to_rgb_array(hex: &str) -> Vec<u8> {
   hex = hex.replace("#", "");
 
   if hex.len() == 3 {
-    hex = format!("{}{}", hex, hex);
+    let mut new_hex = String::new();
+    for c in hex.chars() {
+      new_hex.push_str(&c.to_string().repeat(2));
+    }
+    hex = new_hex;
   }
 
   let (r, gb) = hex.split_at(2);
