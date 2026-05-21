@@ -55,7 +55,8 @@ fn update_theme_to_an_existing_project() {
   create(
     project.to_str().unwrap(),
     Some(theme.clone()),
-    Some(true)
+    Some(true),
+    Some("npm".to_string())
   ).unwrap();
 
   std::env::set_current_dir(&project).unwrap();
@@ -91,7 +92,8 @@ fn update_custom_theme_to_an_existing_project() {
   create(
     project.to_str().unwrap(),
     Some("zinc".to_string()),
-    Some(true)
+    Some(true),
+    Some("npm".to_string())
   ).unwrap();
   std::env::set_current_dir(&project).unwrap();
 

@@ -11,11 +11,18 @@
   use indicatif::ProgressBar;
   use std::time::Duration;
   use crate::handlers::inquire_i18n::inquire_i18n;
+  use crate::handlers::inquire_node_package::inquire_node_package_man;
   use crate::init::git::{clone_with_api, clone_with_git, is_git_available};
   use crate::init::theming::init_theme;
-  use crate::init::update_config::{update_cargo_toml, update_package_json, update_theme};
+  use crate::init::update_config::{update_cargo_toml, update_node_package_man, update_package_json, update_theme};
+  use crate::types::node_package::NodePackageMan;
 
-  pub(crate) fn create(project_name: &str, theme: Option<String>, i18n: Option<bool>) -> Result<(), Box<dyn Error>> {
+  pub(crate) fn create(
+    project_name: &str,
+    theme: Option<String>,
+    i18n: Option<bool>,
+    package: Option<String>,
+  ) -> Result<(), Box<dyn Error>> {
     let project_dir = PathBuf::from(project_name);
     println!();
     println!("Creating a new Yew project: {}", project_name);
@@ -36,6 +43,12 @@
         .map_err(|e| format!(" Failed to determine i18n settings: {}", e))?
     };
 
+    let package_manager = match package {
+      Some(package_manager) => package_manager,
+      None => inquire_node_package_man()
+        .map_err(|e| format!(" Failed to determine node package manager: {}", e))?
+    };
+
     fs::create_dir_all(&project_dir)
       .map_err(|e| format!(" Failed to create project directory: {}", e))?;
 
@@ -53,6 +66,10 @@
     update_theme(&project_dir, color)
       .map_err(|e| format!(" Failed to apply theme: {}", e))?;
 
+    spinner.enable_steady_tick(Duration::from_millis(80));
+    spinner.set_message("Setting up node package manager...");
+    update_node_package_man(&project_dir, &package_manager);
+
     spinner.finish_and_clear();
 
     println!();
@@ -60,8 +77,16 @@
     println!();
     println!("Next steps:");
     println!("   1. cd {}", project_name);
-    println!("   2. yarn && yarn build");
-    println!("   3. cargo add yew web-sys wasm-logger yew-router gloo");
+    println!(
+      "   2. {} install && {} {}",
+      &package_manager,
+      &package_manager,
+      NodePackageMan::from_str(&package_manager)
+        .unwrap_or_default()
+        .get_build_command()
+        .join(" ")
+    );
+    println!("   3. cargo fetch");
     println!("   4. trunk serve");
     println!();
     println!("Then add components with: yewi add <component-name>");
