@@ -19,7 +19,8 @@ fn create_fails_if_dir_already_exists() {
   let result = create(
     project.to_str().unwrap(),
     Some("slate".into()),
-    Some(true)
+    Some(true),
+    Some("npm".to_string())
   );
   assert!(result.is_err());
   assert!(result.unwrap_err().to_string().contains("already exists"));
@@ -31,7 +32,8 @@ fn create_rejects_invalid_theme() {
   let result = create(
     project.to_str().unwrap(),
     Some("invalid-color".into()),
-    Some(true)
+    Some(true),
+    Some("npm".to_string())
   );
 
   assert!(result.is_err());
@@ -46,7 +48,8 @@ fn produces_expected_project_structure() {
   create(
     project.to_str().unwrap(),
     Some("sky".into()),
-    Some(true)
+    Some(true),
+    Some("npm".to_string())
   ).unwrap();
 
   assert!(project.join("src").exists());
@@ -74,7 +77,8 @@ fn create_with_i18n_produces_expected_project_structure() {
   create(
     project.to_str().unwrap(),
     Some("sky".into()),
-    Some(true)
+    Some(true),
+    Some("npm".to_string()),
   ).unwrap();
 
   assert!(project.join("src").exists());
@@ -108,7 +112,8 @@ fn create_with_custom_hex_theme() {
   create(
     project.to_str().unwrap(),
     Some(hex.into()),
-    Some(true)
+    Some(true),
+    Some("npm".to_string())
   ).unwrap();
 
   let shades = shades_of(hex).unwrap();
@@ -126,5 +131,53 @@ fn create_with_custom_hex_theme() {
       }
     }
   }
+  assert!(remove_dir_all(&project).is_ok());
+}
+
+#[test]
+fn create_with_yarn_package_manager() {
+  let project = temp_dir().join("yew-test-yarn");
+  create(
+    project.to_str().unwrap(),
+    Some("sky".into()),
+    Some(true),
+    Some("yarn".to_string())
+  ).unwrap();
+
+  let trunk_toml = fs::read_to_string(project.join("Trunk.toml")).unwrap();
+  assert!(trunk_toml.contains("command = \"yarn\""));
+  assert!(trunk_toml.contains("command_arguments = [\"build\"]"));
+  assert!(remove_dir_all(&project).is_ok());
+}
+
+#[test]
+fn create_with_pnpm_package_manager() {
+  let project = temp_dir().join("yew-test-pnpm");
+  create(
+    project.to_str().unwrap(),
+    Some("sky".into()),
+    Some(true),
+    Some("pnpm".to_string())
+  ).unwrap();
+
+  let trunk_toml = fs::read_to_string(project.join("Trunk.toml")).unwrap();
+  assert!(trunk_toml.contains("command = \"pnpm\""));
+  assert!(trunk_toml.contains("command_arguments = [\"run\", \"build\"]"));
+  assert!(remove_dir_all(&project).is_ok());
+}
+
+#[test]
+fn create_with_bun_package_manager() {
+  let project = temp_dir().join("yew-test-bun");
+  create(
+    project.to_str().unwrap(),
+    Some("sky".into()),
+    Some(true),
+    Some("bun".to_string())
+  ).unwrap();
+
+  let trunk_toml = fs::read_to_string(project.join("Trunk.toml")).unwrap();
+  assert!(trunk_toml.contains("command = \"bun\""));
+  assert!(trunk_toml.contains("command_arguments = [\"run\", \"build\"]"));
   assert!(remove_dir_all(&project).is_ok());
 }
