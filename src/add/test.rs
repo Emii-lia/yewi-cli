@@ -54,7 +54,8 @@ fn add_component_to_existing_project() {
   create(
     project.to_str().unwrap(),
     Some("sky".into()),
-    Some(true)
+    Some(true),
+    Some("npm".to_string())
   ).unwrap();
 
   std::env::set_current_dir(project.clone()).unwrap();
@@ -82,7 +83,8 @@ fn add_existing_component() {
   create(
     project.to_str().unwrap(),
     Some("sky".into()),
-    Some(true)
+    Some(true),
+    Some("npm".to_string())
   ).unwrap();
 
   std::env::set_current_dir(project.clone()).unwrap();
@@ -102,7 +104,8 @@ fn add_dependencies_before_component() {
   create(
     project.to_str().unwrap(),
     Some("sky".into()),
-    Some(true)
+    Some(true),
+    Some("npm".to_string())
   ).unwrap();
 
   std::env::set_current_dir(project.clone()).unwrap();
