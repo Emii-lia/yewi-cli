@@ -68,7 +68,8 @@
 
     spinner.enable_steady_tick(Duration::from_millis(80));
     spinner.set_message("Setting up node package manager...");
-    update_node_package_man(&project_dir, &package_manager);
+    update_node_package_man(&project_dir, &package_manager)
+      .map_err(|e| format!(" Failed to set up node package manager: {}", e))?;
 
     spinner.finish_and_clear();
 
