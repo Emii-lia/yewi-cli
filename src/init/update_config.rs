@@ -3,6 +3,7 @@ use std::fs;
 use std::path::PathBuf;
 use regex::Regex;
 use crate::types::color::Color;
+use crate::types::node_package::NodePackageMan;
 use crate::utils::shade::{is_valid_hex, shades_of, ShadeKey};
 
 pub(crate) fn update_cargo_toml(project_dir: &PathBuf) -> Result<(), Box<dyn Error>> {
@@ -74,5 +75,34 @@ pub fn update_theme(project_dir: &PathBuf, color: String) -> Result<(), Box<dyn 
   fs::write(&style_path, style_content)
     .map_err(|e| format!("❌ Failed to update theme in main.scss: {}", e))?;
 
+  Ok(())
+}
+
+pub fn update_node_package_man(project_dir: &PathBuf, package_man: &str) -> Result<(), Box<dyn Error>> {
+  let trunk_config_path = project_dir.join("Trunk.toml");
+  let mut trunk_config_content = fs::read_to_string(&trunk_config_path)
+    .map_err(|e| format!("Failed to read trunk.toml: {}", e)).unwrap_or_else(|_|
+      fs::read_to_string(project_dir.join("trunk.toml"))
+        .map_err(|e| format!("Failed to read trunk.toml: {}", e))
+        .expect("Failed to read trunk.toml")
+  );
+
+  trunk_config_content = trunk_config_content.replace(
+    "command = \"npm\"",
+    &format!("command = \"{}\"", package_man.to_lowercase()),
+  );
+  trunk_config_content = trunk_config_content.replace(
+    "command_arguments = [\"run\", \"build\"]",
+    &format!(
+      "command_arguments = [\"{}\"]", 
+      NodePackageMan::from_str(package_man)
+        .unwrap_or(NodePackageMan::default())
+        .get_build_command()
+      .join("\", \"")
+    ),
+  );
+  
+  fs::write(&trunk_config_path, trunk_config_content)
+    .map_err(|e| format!("Failed to update Trunk.toml: {}", e))?;
   Ok(())
 }
