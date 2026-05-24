@@ -37,7 +37,7 @@ fn update_an_invalid_project_structure() {
 
   std::env::set_current_dir(&project_buf.path).unwrap();
 
-  let result = update(Some("slate".to_string()));
+  let result = update(Some("slate".to_string()), None);
   assert!(result.is_err());
   assert!(result.unwrap_err().to_string().contains("must be run inside a Yewi project directory"));
   std::env::set_current_dir(&original_cwd).unwrap();
@@ -60,7 +60,7 @@ fn update_theme_to_an_existing_project() {
   ).unwrap();
 
   std::env::set_current_dir(&project).unwrap();
-  let result = update(Some(String::from(new_theme.clone())));
+  let result = update(Some(String::from(new_theme.clone())), None);
 
   assert!(result.is_ok());
   assert!(project.join("src").exists());
@@ -97,7 +97,7 @@ fn update_custom_theme_to_an_existing_project() {
   ).unwrap();
   std::env::set_current_dir(&project).unwrap();
 
-  let result = update(Some(hex.into()));
+  let result = update(Some(hex.into()), None);
   assert!(result.is_ok());
 
   let shades = shades_of(hex).unwrap();
@@ -115,5 +115,31 @@ fn update_custom_theme_to_an_existing_project() {
       }
     }
   }
+  std::env::set_current_dir(&original_cwd).unwrap();
+}
+
+#[test]
+fn update_node_package_manager_to_an_existing_project() {
+  let _guard = CWD_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+  let project_buf = ProjectBuf::new("yew-update-node-package-manager");
+  let project = project_buf.path.clone();
+  let original_cwd = std::env::current_dir().unwrap();
+  create(
+    project.to_str().unwrap(),
+    Some("zinc".to_string()),
+    Some(true),
+    Some("npm".to_string())
+  ).unwrap();
+  std::env::set_current_dir(&project).unwrap();
+
+  let result = update(None, Some("bun".to_string()));
+  assert!(result.is_ok());
+  assert!(project.join("package.json").exists());
+
+  let trunk_toml = project.join("Trunk.toml");
+  assert!(trunk_toml.exists());
+  let content = std::fs::read_to_string(trunk_toml).unwrap();
+  assert!(content.contains("command = \"bun\""));
+  assert!(!content.contains("command = \"npm\""));
   std::env::set_current_dir(&original_cwd).unwrap();
 }
