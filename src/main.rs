@@ -57,7 +57,9 @@ enum Commands {
   #[command(about = "Update Yewi project configuration")]
   Set {
     #[arg(long, short, required = false, help = "New theme value. If not specified, you will be prompted to choose a theme interactively.")]
-    theme: Option<String>
+    theme: Option<String>,
+    #[arg(long, short, required = false, help = "New package manager value. If not specified, you will be prompted to choose a package manager interactively.")]
+    package: Option<String>,
   }
 }
 #[derive(Parser)]
@@ -106,8 +108,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         println!("Failed to convert hex to shades");
       }
     },
-    Commands::Set { theme } => {
-      update(theme)?;
+    Commands::Set { theme, package } => {
+      update(theme, package)?;
     }
   }
 

@@ -87,8 +87,7 @@
         .get_build_command()
         .join(" ")
     );
-    println!("   3. cargo fetch");
-    println!("   4. trunk serve");
+    println!("   3. trunk serve");
     println!();
     println!("Then add components with: yewi add <component-name>");
     println!();
