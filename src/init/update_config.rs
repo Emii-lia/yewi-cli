@@ -87,21 +87,21 @@ pub fn update_node_package_man(project_dir: &PathBuf, package_man: &str) -> Resu
         .expect("Failed to read trunk.toml")
   );
 
-  trunk_config_content = trunk_config_content.replace(
-    "command = \"npm\"",
-    &format!("command = \"{}\"", package_man.to_lowercase()),
-  );
-  trunk_config_content = trunk_config_content.replace(
-    "command_arguments = [\"run\", \"build\"]",
-    &format!(
-      "command_arguments = [\"{}\"]", 
-      NodePackageMan::from_str(package_man)
-        .unwrap_or(NodePackageMan::default())
-        .get_build_command()
+  let package_re = Regex::new(r#"command\s*=\s*"[^"]+""#)
+    .map_err(|e| format!("Failed to compile regex pattern: {}", e))?;
+  let args_re = Regex::new(r#"command_arguments\s*=\s*\[[^(\[|\]]+]"#)
+    .map_err(|e| format!("Failed to compile regex pattern: {}", e))?;
+
+  trunk_config_content = package_re.replace_all(&trunk_config_content, &format!("command = \"{}\"", package_man)).into_owned();
+
+  trunk_config_content = args_re.replace_all(&trunk_config_content, &format!(
+    "command_arguments = [\"{}\"]",
+    NodePackageMan::from_str(package_man)
+      .unwrap_or(NodePackageMan::default())
+      .get_build_command()
       .join("\", \"")
-    ),
-  );
-  
+  )).into_owned();
+
   fs::write(&trunk_config_path, trunk_config_content)
     .map_err(|e| format!("Failed to update Trunk.toml: {}", e))?;
   Ok(())
