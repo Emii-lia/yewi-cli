@@ -4,7 +4,7 @@ use crate::types::node_package::NodePackageMan;
 
 pub fn install_package(package_name: &str) -> Result<(), Box<dyn Error>> {
   println!("Installing tailwind");
-  let package = NodePackageMan::from_str(package_name)
+  let _ = NodePackageMan::from_str(package_name)
     .expect("Failed to parse package manager from string");
 
   let output = Command::new(package_name)

@@ -15,7 +15,6 @@
   use crate::init::git::{clone_with_api, clone_with_git, is_git_available};
   use crate::init::theming::init_theme;
   use crate::init::update_config::{update_cargo_toml, update_node_package_man, update_package_json, update_theme};
-  use crate::types::node_package::NodePackageMan;
 
   pub(crate) fn create(
     project_name: &str,
