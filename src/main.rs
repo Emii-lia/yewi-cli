@@ -6,6 +6,7 @@ use crate::add::add;
 use crate::convert::convert;
 use crate::handlers::select_components::select_components;
 use crate::init::create;
+use crate::install::install;
 use crate::list::list;
 use crate::update::update;
 
@@ -17,6 +18,7 @@ mod init;
 mod list;
 pub mod update;
 pub mod convert;
+pub mod install;
 
 #[derive(Subcommand)]
 enum Commands {
@@ -36,7 +38,6 @@ enum Commands {
     package: Option<String>,
   },
   #[command(
-    aliases = &["install", "i"],
     about = "Add one or more Yewi components to an existing project.",
     long_about = "Add one or more Yewi components to an existing project. You can specify multiple component names. Aliases: 'install', 'i'",
     override_usage = "yewi add <component_name1> <component_name2> ...",
@@ -60,7 +61,12 @@ enum Commands {
     theme: Option<String>,
     #[arg(long, short, required = false, help = "New package manager value. If not specified, you will be prompted to choose a package manager interactively.")]
     package: Option<String>,
-  }
+  },
+  #[command(
+    alias = "init",
+    about = "Install and setup yewi project packages",
+  )]
+  Install
 }
 #[derive(Parser)]
 #[command(name = "yewi")]
@@ -110,6 +116,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     },
     Commands::Set { theme, package } => {
       update(theme, package)?;
+    },
+    Commands::Install => {
+      install()?;
     }
   }
 

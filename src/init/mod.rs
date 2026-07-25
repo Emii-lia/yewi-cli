@@ -15,7 +15,6 @@
   use crate::init::git::{clone_with_api, clone_with_git, is_git_available};
   use crate::init::theming::init_theme;
   use crate::init::update_config::{update_cargo_toml, update_node_package_man, update_package_json, update_theme};
-  use crate::types::node_package::NodePackageMan;
 
   pub(crate) fn create(
     project_name: &str,
@@ -78,15 +77,7 @@
     println!();
     println!("Next steps:");
     println!("   1. cd {}", project_name);
-    println!(
-      "   2. {} install && {} {}",
-      &package_manager,
-      &package_manager,
-      NodePackageMan::from_str(&package_manager)
-        .unwrap_or_default()
-        .get_build_command()
-        .join(" ")
-    );
+    println!("   2. yewi install");
     println!("   3. trunk serve");
     println!();
     println!("Then add components with: yewi add <component-name>");
