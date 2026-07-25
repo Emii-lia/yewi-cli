@@ -78,15 +78,7 @@
     println!();
     println!("Next steps:");
     println!("   1. cd {}", project_name);
-    println!(
-      "   2. {} install && {} {}",
-      &package_manager,
-      &package_manager,
-      NodePackageMan::from_str(&package_manager)
-        .unwrap_or_default()
-        .get_build_command()
-        .join(" ")
-    );
+    println!("   2. yewi install");
     println!("   3. trunk serve");
     println!();
     println!("Then add components with: yewi add <component-name>");
